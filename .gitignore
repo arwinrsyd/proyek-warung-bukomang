@@ -1,0 +1,17 @@
+# Abaikan folder sistem dan dependensi
+/system/
+/vendor/
+
+# Abaikan file konfigurasi yang mungkin berisi password
+/application/config/database.php
+/application/config/midtrans.php
+
+# Abaikan folder cache dan log
+/application/cache/*
+!/application/cache/index.html
+/application/logs/*
+!/application/logs/index.html
+
+# Abaikan file-file sementara dari sistem operasi
+.DS_Store
+Thumbs.db
