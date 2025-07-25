@@ -51,10 +51,14 @@ class Pesan extends CI_Controller {
 
     public function proses_pesanan()
     {
-        if ($this->input->post('metode_pembayaran') == 'Tunai') {
+        $metode_pembayaran = $this->input->post('metode_pembayaran');
+
+        if ($metode_pembayaran == 'Tunai') {
             $this->_proses_pesanan_tunai();
-        } else if ($this->input->post('metode_pembayaran') == 'BCA_VA') {
-            $this->_proses_pembayaran_va();
+        } 
+        // Cek jika metode pembayaran adalah salah satu dari VA
+        else if (in_array($metode_pembayaran, ['bca_va', 'bri_va', 'bni_va'])) {
+            $this->_proses_pembayaran_va($metode_pembayaran);
         }
     }
 
@@ -86,14 +90,20 @@ class Pesan extends CI_Controller {
         }
     }
 
-    private function _proses_pembayaran_va()
+    private function _proses_pembayaran_va($metode)
     {
+        // Mendapatkan kode bank ('bca', 'bri', 'mandiri') dari nilai yang dikirim
+        $bank_code = explode('_', $metode)[0]; 
+        // Mendapatkan nama bank yang lebih deskriptif untuk disimpan
+        $bank_name = strtoupper($bank_code) . ' VA';
+
+        // 1. Simpan pesanan ke database
         $order_id = 'WBK-VA-' . time();
         $data_pesanan = [
             'id_meja'           => $this->session->userdata('id_meja'),
             'order_id'          => $order_id,
             'total_harga'       => $this->cart->total(),
-            'metode_pembayaran' => 'BCA VA',
+            'metode_pembayaran' => $bank_name,
             'status_pembayaran' => 'Pending',
             'status_pesanan'    => 'Menunggu Pembayaran'
         ];
@@ -103,10 +113,12 @@ class Pesan extends CI_Controller {
         }
         $id_pesanan_db = $this->Pesanan_model->simpan_pesanan($data_pesanan, $detail_pesanan);
 
+        // 2. Konfigurasi Midtrans
         require_once APPPATH . 'third_party/Midtrans/Midtrans.php';
         \Midtrans\Config::$serverKey = $this->config->item('server_key');
         \Midtrans\Config::$isProduction = $this->config->item('is_production');
 
+        // 3. Siapkan parameter untuk meminta nomor VA
         $transaction_params = array(
             'payment_type' => 'bank_transfer',
             'transaction_details' => array(
@@ -114,18 +126,23 @@ class Pesan extends CI_Controller {
                 'gross_amount' => (int) $this->cart->total(),
             ),
             'bank_transfer' => array(
-                'bank' => 'bca'
+                'bank' => $bank_code // Menggunakan kode bank yang dinamis
             )
         );
+        
 
         try {
+            // 4. Minta nomor VA ke Midtrans
             $response = \Midtrans\CoreApi::charge($transaction_params);
+
+            // 5. Jika berhasil, simpan nomor VA dan arahkan ke halaman sukses
             if ($response->status_code == 201) {
                 $va_number = $response->va_numbers[0]->va_number;
                 $this->Pesanan_model->update_status_by_order_id($order_id, ['nomor_va' => $va_number]);
                 $this->cart->destroy();
                 redirect('pesan/sukses_va/' . $id_pesanan_db);
             }
+
         } catch (Exception $e) {
             $this->session->set_flashdata('message', '<div class="alert alert-danger" role="alert">Gagal mendapatkan nomor Virtual Account. Error: ' . $e->getMessage() . '</div>');
             redirect('pesan/meja/' . $this->session->userdata('id_meja'));
