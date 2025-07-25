@@ -1,5 +1,26 @@
-<!-- LOKASI: application/views/pesan/sukses_va.php -->
+<?php
+// (Bagian perhitungan waktu kedaluwarsa tidak berubah)
+date_default_timezone_set('Asia/Jakarta');
+$waktu_pesan = new DateTime($data_pesanan['pesanan']->waktu_pesanan);
+$waktu_kedaluwarsa = $waktu_pesan->modify('+1 hour')->format('Y-m-d H:i:s');
 
+// Menentukan nama bank dan path logo berdasarkan metode pembayaran
+$metode_pembayaran = $data_pesanan['pesanan']->metode_pembayaran;
+$bank_info = [
+    'logo' => 'https://via.placeholder.com/100x30.png?text=Bank',
+    'nama' => 'Virtual Account'
+];
+if (strpos($metode_pembayaran, 'BCA') !== false) {
+    $bank_info['logo'] = 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Bank_Central_Asia_logo.svg/2560px-Bank_Central_Asia_logo.svg.png';
+    $bank_info['nama'] = 'BCA Virtual Account';
+} else if (strpos($metode_pembayaran, 'BRI') !== false) {
+    $bank_info['logo'] = 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/BANK_BRI_logo.svg/2560px-BANK_BRI_logo.svg.png';
+    $bank_info['nama'] = 'BRI Virtual Account';
+} else if (strpos($metode_pembayaran, 'MANDIRI') !== false) {
+    $bank_info['logo'] = 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Bank_Mandiri_logo_2016.svg/2560px-Bank_Mandiri_logo_2016.svg.png';
+    $bank_info['nama'] = 'Mandiri Virtual Account';
+}
+?>
 <!-- CSS Kustom untuk Halaman Pembayaran -->
 <style>
     :root {
