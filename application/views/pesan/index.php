@@ -134,6 +134,7 @@
 
     .add-to-cart-btn {
         background: var(--primary-gradient);
+        color: white;
         border: none;
         padding: 0.8rem 1.5rem;
         border-radius: 50px;
@@ -508,22 +509,43 @@
                                 <div class="payment-option" onclick="selectPayment('tunai')">
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="metode_pembayaran" 
-                                               id="tunai" value="Tunai" checked>
+                                            id="tunai" value="Tunai" checked>
                                         <label class="form-check-label fw-bold" for="tunai">
                                             <i class="fas fa-money-bill-wave me-2"></i>Tunai (Bayar di Kasir)
                                         </label>
                                     </div>
                                 </div>
                                 
-                                                                <!-- GUNAKAN BLOK DIV INI SEBAGAI PENGGANTI -->
+                                <!-- Opsi BCA VA -->
                                 <div class="payment-option" onclick="selectPayment('bca_va')">
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="metode_pembayaran" 
-                                            id="bca_va" value="BCA_VA">
+                                            id="bca_va" value="bca_va">
                                         <label class="form-check-label fw-bold" for="bca_va">
                                             <i class="fas fa-university me-2"></i>BCA Virtual Account
                                         </label>
                                     </div>
+                                </div>
+
+                                <!-- Opsi BRI VA -->
+                                <div class="payment-option" onclick="selectPayment('bri_va')">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="metode_pembayaran" 
+                                            id="bri_va" value="bri_va">
+                                        <label class="form-check-label fw-bold" for="bri_va">
+                                            <i class="fas fa-university me-2"></i>BRI Virtual Account
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Opsi BNI VA -->
+                            <div class="payment-option" onclick="selectPayment('bni_va')">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="metode_pembayaran"
+                                        id="bni_va" value="bni_va">
+                                    <label class="form-check-label fw-bold" for="bni_va">
+                                        <i class="fas fa-university me-2"></i>BNI Virtual Account
+                                    </label>
                                 </div>
                             </div>
 
